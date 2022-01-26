@@ -4,7 +4,7 @@ This is the initial release that only calculates these values at a single veloci
 
 #Properties to measure
 The surface height of the rocket is needed. OpenRocket defaults to 60micrometers. This depends on the rocket's material
-Length of the nosecone and length of body tube
+Length of the nosecone and length of body tube. - This sim only allows for conical nose cones (for now)
 Diameter of the rocket. 
 This sim assumes the nose cone and body tube have the same diameter and surfaceheight.
 
