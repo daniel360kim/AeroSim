@@ -10,7 +10,7 @@
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "${workspaceFolder}/lib/Aero.cpp", //To include all the cpp that needs to be executed, include the cpp corresponding to the custom header file
+                "${workspaceFolder}/Aero.cpp", //To include all the cpp that needs to be executed, include the cpp corresponding to the custom header file
             ],
             "options": {
                 "cwd": "${fileDirname}"

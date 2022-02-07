@@ -1,16 +1,8 @@
-/*
-
-A simple drag library for model rockets. 
-
-V1.0 Init:
-Only accounts for finless subsonic rockets with 0 angle of attack
-
-*/
-
 #ifndef Aero_h
 #define Aero_h
 
 #include <math.h>
+
 
 class Aero 
 {
@@ -20,7 +12,6 @@ public:
     double ReynoldsNumber; //Reynolds Number
     double Cf, Cd, Cp, Cb; //coefficient of skin friciton
     double Mach;
-
 
     void Init(double diameter, double surfaceHeight, double NCheight, double BTheight, short NCtype, short engine);
 
@@ -45,6 +36,8 @@ private:
     double sl_pressurePa = 101325; //Stock sea level pressure in pascals
     double critRN; //we are just using a constant value for now :)
     double engineDiameter;
+
+    bool flow = false; //true for laminar, false for turbulent: defaults to turbuient
     
 };
 
@@ -52,6 +45,7 @@ private:
 #define Millibar  0
 #define mmHg      1
 #define atm       2
+#define PSI       3
 
 #define C_TO_K    273.15f
 
@@ -66,6 +60,8 @@ private:
 #define D12  4
 #define E9   5
 #define E12  6
+
+
 
 
 
