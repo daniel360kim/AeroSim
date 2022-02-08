@@ -2,7 +2,8 @@
 #define Aero_h
 
 #include <math.h>
-
+#include <limits>
+#include <algorithm>
 
 class Aero 
 {
@@ -10,7 +11,7 @@ public:
     double density;
     double drag;
     double ReynoldsNumber; //Reynolds Number
-    double Cf, Cd, Cp, Cb; //coefficient of skin friciton
+    double Cf, Cd, Cp, Cb, Cpm, Cn;
     double Mach;
 
     void Init(double diameter, double surfaceHeight, double NCheight, double BTheight, short NCtype, short engine);
@@ -24,20 +25,28 @@ public:
     double calculateCp();
     double calculateCb();
 
+    double calculateCpm(double aoa);
+    double calculateCn(double aoa);
+
     //Convert barometric and temp data from sensors into an altitude reading
     double altitude(double temperature, double pressure);
     double updateSealevel(double newinput); //in case we want a more accurate reading
 
     double DynamicViscosity, KinematicViscosity; 
     double wetArea;
+
    
 private:
     double temperature, pressure;
     double sl_pressurePa = 101325; //Stock sea level pressure in pascals
-    double critRN; //we are just using a constant value for now :)
-    double engineDiameter;
 
-    bool flow = false; //true for laminar, false for turbulent: defaults to turbuient
+    double engineDiameter;
+    double cpmnc, cpmbt;
+    double cnnc, cnbt;
+
+    
+
+
     
 };
 

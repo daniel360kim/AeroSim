@@ -18,7 +18,7 @@ class RocketProperties
 {
 public:
     double surfaceArea; //also going to be the wet area since we are only simlating a straight flight
-    double surfaceHeight; //for now we are assuming the body tube and the nosecone are made of the same material and therefore have the same surface height
+    double surfaceHeight; //for now we are assuming the body tube and the nosecone are made of the same material and therefore have the same surface height - in meters
     double length; //how schlong the rocket is
     double area; //for now the reference area is the area of the body tube/nose cone since we are only simulating a straight flight
     double volume;
@@ -37,10 +37,10 @@ public:
     
     double NoseCone_L, BodyTube_L; //length of the nosecone and bodytube seperately
     double NoseCone_V, BodyTube_V;
-private:
-   
     
     double NoseCone_SA, BodyTube_SA; //surface areas of the nosecone and bodytube seperately 
+private:
+
 };
 
 
@@ -54,6 +54,7 @@ void RocketProperties::setRocketProperties(double diameter, double surfaceHeight
     this->surfaceHeight = surfaceHeight;
 
     area = PI * radius * radius;
+
 }
 
 void RocketProperties::setNoseCone(short type, double height)
@@ -93,5 +94,7 @@ double RocketProperties::calculateVolume()
     volume = NoseCone_V + BodyTube_V;
     return volume;
 }
+
+
 
 #endif

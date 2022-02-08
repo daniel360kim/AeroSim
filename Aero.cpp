@@ -65,8 +65,12 @@ double Aero::convertPressure(short unit, double input) //Simple function to conv
             break;
         case atm:
             output = input * 101325;
+            break;
         case PSI:
             output = input * 6895;
+            break;
+        default:
+            output = 101325; //defaults to sealevel pressure 
     }
 
     return output;
@@ -78,44 +82,80 @@ double Aero::calculateMach(double velocity)
     return Mach;
 }
 
-double Aero::calculateCf(double velocity) //this calculates cf: this function is a MESS rn. plz allow time for some cleaning....
+double Aero::calculateCf(double velocity) //this calculates coefficient of skin friction drag
 {
-
-     DynamicViscosity = (0.004774183564 * temperature + 1.729f) / 100000; //this is a line of best fit for experimental d.viscosity values - will implement Sutherland's law soon :)
+     DynamicViscosity = 3.7291e-6 + (4.9944e-8 * (temperature + C_TO_K));
      KinematicViscosity = DynamicViscosity / density; 
 
-     critRN = 51.0 * pow((properties.surfaceHeight / properties.length), -1.039);
      ReynoldsNumber = velocity * properties.length / KinematicViscosity;
      
-     //Correcting Coefficient of friction drag based on flow/Reynold's Number
-     if(ReynoldsNumber < 1e5) //Low RN need to be filtered out (velocites less than ~1m/s)
+     double MachSquared = Mach * Mach; //because mach^2 is used a bunch, its better just to assing it to a var
+
+     double c1 = 1.0, c2 = 1.0; //compressibility correction factors
+
+     /*This is all assuming that we are in turbulent flow
+       Since the laminar to turbulent region cannot be accurately defined, and the Reynold's number has many variables, we just assume that flow is turbulent.
+     */
+     if(ReynoldsNumber < 1e4)
      {
          Cf = 1.48e-2;
      }
-     else if(ReynoldsNumber < critRN && ReynoldsNumber > 1e5) //Cf while the vehicle is in laminar flow
+     else
      {
-         Cf = 1 / pow((3.46 * log(ReynoldsNumber) - 5.6), 2);
-         flow = true;
+         Cf = 1.0 / pow(1.50 * log(ReynoldsNumber) - 5.6, 2);
+     } 
+
+     //Applying compressibility corrections
+     if(Mach < 1.1)
+     {
+         c1 = 1 - 0.1 * MachSquared;
      }
-     else if(ReynoldsNumber > critRN) //Cf while the vehicle is in turbulent flow
+     if(Mach > 0.9)
      {
-         Cf = 0.032 * pow((properties.surfaceHeight / properties.length), 0.2);
-         flow = false;
+         c2 = 1 / pow(1 + 0.15 * MachSquared, 0.58);
+     } 
+
+     if(Mach < 0.9)
+     {
+         Cf *= c1; 
+     }
+     else if(Mach < 1.1)
+     {
+         Cf *= c2 * (Mach - 0.9) / 0.2 + c1 * (1.1 - Mach) / 0.2;
+     }
+     else
+     {
+         Cf *= c2;
      }
      
-     //Adding compressibility corrections based on flow
-     if(flow == true)
+     //making corrections based on the surface height of the vehicle
+     double roughCorrection;
+
+     if(Mach < 0.9)
      {
-         Cf = Cf * (1 - 0.09 * Mach * Mach);
+         roughCorrection = 1 - 0.1 * MachSquared;
      }
-     else if(flow == false)
+     else if(Mach > 1.1)
      {
-         Cf = Cf * (1 - 0.12 * Mach * Mach);
+         roughCorrection = 1 / (1 + 0.18 * MachSquared);
      }
-    
-     Cf = (Cf * (((1 + (1 / (2 * (properties.length / properties.diameter)))) * wetArea) / properties.area)); 
+     else 
+     {
+         c1 = 0.919;  //1 - 0.1 * pow(0.9, 2) = 0.919....
+		 c2 = 1.0 / (1 + 0.18 * 1.1 * 1.1);
+		 roughCorrection = c2 * (Mach - 0.9) / 0.2 + c1 * (1.1 - Mach) / 0.2;
+     }
+
+     double bodyFriction;
+
+     double turbCf = 0.032 * pow(properties.surfaceHeight / properties.length, 0.2) * roughCorrection;
+     double componentCf = std::max(Cf, turbCf); //since we are assuming full turbulent flow, we just find the max 
+
+     bodyFriction += componentCf * properties.surfaceArea;
+     
+     Cf = bodyFriction / properties.area;
+
      return Cf;
-     
 }
 
  double Aero::calculateCp() //Very simple :)
@@ -139,6 +179,24 @@ double Aero::calculateCb() //more will be added to this when supersonic flight a
 
 double Aero::calculateCd(double velocity)
 {
-    Cd = calculateMach(velocity) + calculateCf(velocity) + calculateCp() + calculateCb();
+    calculateMach(velocity);
+    Cd = calculateCf(velocity) + calculateCp() + calculateCb();
     return Cd;
+}
+
+double Aero::calculateCpm(double aoa)
+{
+    cpmnc = ((2.0 * sin(aoa * DEG_TO_RAD)) / (properties.NoseCone_SA * properties.diameter)) * (properties.NoseCone_L * properties.NoseCone_SA - properties.volume);
+    cpmbt = ((2.0 * sin(aoa * DEG_TO_RAD)) / (properties.BodyTube_SA * properties.diameter)) * (properties.BodyTube_L * properties.BodyTube_SA - properties.volume); 
+
+    Cpm = cpmnc - cpmbt; 
+    return Cpm;
+}
+
+double Aero::calculateCn(double aoa)
+{
+    cnnc = ((2.0 * sin(aoa * DEG_TO_RAD)) / properties.NoseCone_SA) * properties.area;
+    cnbt = ((2.0 * sin(aoa * DEG_TO_RAD)) / properties.BodyTube_SA) * properties.area;
+    Cn = cnnc + cnbt;
+    return Cn;
 }
