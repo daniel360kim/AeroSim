@@ -79,6 +79,7 @@ double Aero::convertPressure(short unit, double input) //Simple function to conv
 double Aero::calculateMach(double velocity)
 {
     Mach = velocity / (sqrt(1.4f * 8.314 * (temperature + C_TO_K) / 0.0289645));
+    MachSquared = Mach * Mach; //Mach^2 is used a lot in the Coefficient calculations so it is a good idea to assign to a var
     return Mach;
 }
 
@@ -88,8 +89,6 @@ double Aero::calculateCf(double velocity) //this calculates coefficient of skin 
      KinematicViscosity = DynamicViscosity / density; 
 
      ReynoldsNumber = velocity * properties.length / KinematicViscosity;
-     
-     double MachSquared = Mach * Mach; //because mach^2 is used a bunch, its better just to assing it to a var
 
      double c1 = 1.0, c2 = 1.0; //compressibility correction factors
 
@@ -158,22 +157,32 @@ double Aero::calculateCf(double velocity) //this calculates coefficient of skin 
      return Cf;
 }
 
- double Aero::calculateCp() //Very simple :)
+
+
+double Aero::calculateCp() //Very simple :)
 {   
-    if(properties.length < properties.radius) {
-       Cp = 0.2; //account for very blunt nosecones which the equation does not account for
+    double cpnc; //coefficient of pressure drag for the nose cone
+    if(properties.NoseCone_L < properties.radius) 
+    {
+       cpnc = 0.2; //account for very blunt nosecones which the equation does not account for
     }
     else
     {
-    Cp = 0.8 * pow(sin(properties.NCjointAngle * DEG_TO_RAD), 2); //since this sim only accounts for 0 angle of attack, the Cpd Nosecone will be the total Cpd
+        cpnc = 0.8 * pow(sin(properties.NCjointAngle * DEG_TO_RAD), 2); //since this sim only accounts for 0 angle of attack, the Cpd Nosecone will be the total Cpd
     }
-
     return Cp;
 }
 
 double Aero::calculateCb() //more will be added to this when supersonic flight and exhaust plume additions are added...
 {
-    Cb = 0.12 + 0.13 * pow(Mach, 2);
+    if(Mach < 1)
+    {
+        Cb = 0.12 + 0.13 * pow(Mach, 2);
+    }
+    else
+    {
+        Cb = 0.25 / Mach;
+    }
     return Cb;
 }
 

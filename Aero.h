@@ -44,10 +44,10 @@ private:
     double cpmnc, cpmbt;
     double cnnc, cnbt;
 
-    
+    double MachSquared;
 
-
-    
+    double calculateStagnationCD();
+    double calculateBaseCD();
 };
 
 //Macros for different pressure units
