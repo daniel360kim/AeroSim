@@ -1,5 +1,4 @@
-
-#include "Aero.h"
+#include "src/aero/Aero.h"
 #include <math.h>
 #include <iostream>
 #include <iomanip>
@@ -8,8 +7,6 @@ Aero aero;
 
 int main(int argc, char const *argv[])
 {
-
-    
     std::cout << "AeroSimulation 1.0: Will calculate Coefficients of drag at a certain velocity and at no angle of attack" << std::endl;
     
     double velocity, diameter, surfaceHeight, NCheight, BTheight;

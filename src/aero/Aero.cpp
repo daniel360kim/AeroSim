@@ -1,6 +1,6 @@
-
 #include "Aero.h"
-#include "Rocket.h"
+#include "../Properties/Rocket.h"
+#include "../utility/functions.h"
 
 RocketProperties properties;
 
@@ -159,17 +159,18 @@ double Aero::calculateCf(double velocity) //this calculates coefficient of skin 
 
 
 
-double Aero::calculateCp() //Very simple :)
+double Aero::calculateCp() //Very simple :)//still a work in progress
 {   
-    double cpnc; //coefficient of pressure drag for the nose cone
-    if(properties.NoseCone_L < properties.radius) 
-    {
-       cpnc = 0.2; //account for very blunt nosecones which the equation does not account for
-    }
-    else
-    {
-        cpnc = 0.8 * pow(sin(properties.NCjointAngle * DEG_TO_RAD), 2); //since this sim only accounts for 0 angle of attack, the Cpd Nosecone will be the total Cpd
-    }
+    double sinNC = sin(properties.NCjointAngle * DEG_TO_RAD);
+
+    double Cp_trans = 0.8 * sinNC * sinNC;
+    double Cp_super = 1.0 * sinNC;
+    //double Cp_super = (2.1 * sinNC * sinNC) + (0.5 * (sinNC / sqrt(1.69026001 - 1.0)));
+
+    Data Cp_values[] = {{0, Cp_trans}, {1.0, Cp_super}};
+
+    Cp = interpolate(Cp_values, Mach, 2);
+
     return Cp;
 }
 

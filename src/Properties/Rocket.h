@@ -33,7 +33,7 @@ public:
     double calculateLength(); //total Length
     double calculateVolume();
     
-    double NCjointAngle;
+    double NCjointAngle, NCfineness;
     
     double NoseCone_L, BodyTube_L; //length of the nosecone and bodytube seperately
     double NoseCone_V, BodyTube_V;
@@ -63,7 +63,8 @@ void RocketProperties::setNoseCone(short type, double height)
     if(type == CONIC)
     {
         NoseCone_SA = PI * radius * (radius + sqrt((height * height) + (radius * radius)));
-        NCjointAngle = 90.0 - (atan((height / radius)) * RAD_TO_DEG); 
+        NCfineness = NoseCone_L / radius; 
+        NCjointAngle = 90.0 -RAD_TO_DEG * atan(NCfineness);
     }
 
     NoseCone_V = PI * radius * radius * height / 3;
