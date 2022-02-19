@@ -8,10 +8,9 @@
 class Aero 
 {
 public:
-    double density;
     double drag;
     double ReynoldsNumber; //Reynolds Number
-    double Cf, Cd, Cp, Cb, Cpm, Cn;
+    double Cf, Cd, Cp, Cb;
     double Mach;
 
     void Init(double diameter, double surfaceHeight, double NCheight, double BTheight, short NCtype, short engine);
@@ -25,8 +24,7 @@ public:
     double calculateCp();
     double calculateCb();
 
-    double calculateCpm(double aoa);
-    double calculateCn(double aoa);
+    double calculateDragForce(double velocity);
 
     //Convert barometric and temp data from sensors into an altitude reading
     double altitude(double temperature, double pressure);
@@ -35,19 +33,14 @@ public:
     double DynamicViscosity, KinematicViscosity; 
     double wetArea;
 
-   
 private:
     double temperature, pressure;
     double sl_pressurePa = 101325; //Stock sea level pressure in pascals
+    double density;
 
     double engineDiameter;
-    double cpmnc, cpmbt;
-    double cnnc, cnbt;
-
     double MachSquared;
 
-    double calculateStagnationCD();
-    double calculateBaseCD();
 };
 
 //Macros for different pressure units

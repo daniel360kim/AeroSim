@@ -157,20 +157,17 @@ double Aero::calculateCf(double velocity) //this calculates coefficient of skin 
      return Cf;
 }
 
-
-
-double Aero::calculateCp() //Very simple :)//still a work in progress
-{   
-    double sinNC = sin(properties.NCjointAngle * DEG_TO_RAD);
-
-    double Cp_trans = 0.8 * sinNC * sinNC;
-    double Cp_super = 1.0 * sinNC;
-    //double Cp_super = (2.1 * sinNC * sinNC) + (0.5 * (sinNC / sqrt(1.69026001 - 1.0)));
-
-    Data Cp_values[] = {{0, Cp_trans}, {1.0, Cp_super}};
-
-    Cp = interpolate(Cp_values, Mach, 2);
-
+double Aero::calculateCp()
+{
+    if(Mach < 1)
+    {
+         Cp = 0.8 * sin(properties.NCjointAngle * DEG_TO_RAD) * sin(properties.NCjointAngle * DEG_TO_RAD);
+    }
+    else
+    {
+        Cp = sin(properties.NCjointAngle * DEG_TO_RAD);
+    }
+    
     return Cp;
 }
 
@@ -190,23 +187,34 @@ double Aero::calculateCb() //more will be added to this when supersonic flight a
 double Aero::calculateCd(double velocity)
 {
     calculateMach(velocity);
-    Cd = calculateCf(velocity) + calculateCp() + calculateCb();
+    Cd = calculateCb() + calculateCp() + calculateCf(velocity);
     return Cd;
 }
 
-double Aero::calculateCpm(double aoa)
+double Aero::calculateDragForce(double velocity)
 {
-    cpmnc = ((2.0 * sin(aoa * DEG_TO_RAD)) / (properties.NoseCone_SA * properties.diameter)) * (properties.NoseCone_L * properties.NoseCone_SA - properties.volume);
-    cpmbt = ((2.0 * sin(aoa * DEG_TO_RAD)) / (properties.BodyTube_SA * properties.diameter)) * (properties.BodyTube_L * properties.BodyTube_SA - properties.volume); 
-
-    Cpm = cpmnc - cpmbt; 
-    return Cpm;
+    calculateCd(velocity);
+    drag = Cd * (0.5 * density * velocity * velocity) * properties.area;
+    return drag;
 }
 
-double Aero::calculateCn(double aoa)
-{
-    cnnc = ((2.0 * sin(aoa * DEG_TO_RAD)) / properties.NoseCone_SA) * properties.area;
-    cnbt = ((2.0 * sin(aoa * DEG_TO_RAD)) / properties.BodyTube_SA) * properties.area;
-    Cn = cnnc + cnbt;
-    return Cn;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

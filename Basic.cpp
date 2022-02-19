@@ -26,10 +26,12 @@ int main(int argc, char const *argv[])
     aero.Init(diameter, surfaceHeight / 1e6, NCheight, BTheight, 0, D12); //all the parameters of the rocket entered. Only conical nosecones supported rn - 0
     std::cout << std::setprecision(10) <<std::fixed; //PRECISE!! lol
 
-    std::cout << "Cd: " << aero.calculateCd(velocity) << std::endl;
+    std::cout << "Drag Force: " << aero.calculateDragForce(velocity) << std::endl;
+    std::cout << "Cd: " << aero.Cd << std::endl;
     std::cout << "Cf: " << aero.Cf << std::endl;
     std::cout << "Cb: " << aero.Cb << std::endl;
     std::cout << "Cp: " << aero.Cp << std::endl;
+    std::cout << "Cd: " << aero.Cd << std::endl;
     std::cout << "Rocket Surface Area: " << aero.wetArea << std::endl;
   
     std::cout << "Mach: " << aero.Mach << std::endl;    
