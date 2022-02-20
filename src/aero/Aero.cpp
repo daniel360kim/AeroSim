@@ -1,6 +1,12 @@
 #include "Aero.h"
 #include "../Properties/Rocket.h"
 #include "../utility/functions.h"
+#include "../utility/MathUtility.h"
+
+
+#include <iostream>
+#include <vector>
+
 
 RocketProperties properties;
 
@@ -198,7 +204,58 @@ double Aero::calculateDragForce(double velocity)
     return drag;
 }
 
+double Aero::calcuateAxialDrag(double aoa)
+{
+    std::vector<double> axialDragPoly1;
+    std::vector<double> axialDragPoly2;
 
+    std::vector<std::vector<double>> v1 
+    {
+        {0.0, 17.0 * PI / 180.0}, 
+        {0.0, 17.0 * PI / 180.0}
+    };
+    PolyInterpolator interpolator1(v1);
+    std::vector<double> vals1 {1.0, 1.3, 0.0, 0.0};
+    axialDragPoly1 = interpolator1.interpolator(vals1);
+
+    std::vector<std::vector<double>> v2
+    {
+        {17.0 * PI / 180, PI / 2.0},
+        {17.0 * PI / 180, PI / 2.0},
+        {PI / 2}
+    };
+    PolyInterpolator interpolator2(v2);
+    std::vector<double> val2 {1.3, 0.0, 0.0, 0.0, 0.0};
+    axialDragPoly2 = interpolator2.interpolator(val2);
+
+    double mul = 0.0;
+    aoa *= DEG_TO_RAD;
+    aoa = clamp(aoa, 0.0, PI);
+
+    if(aoa > PI / 2.0)
+    {
+        aoa = PI - aoa;
+    }
+    if(aoa < 17.0 * PI / 180)
+    {
+        mul = interpolator1.eval(aoa, axialDragPoly1);
+    }
+    else
+    {
+        mul = interpolator2.eval(aoa, axialDragPoly2);
+    }
+
+    if(aoa < PI / 2)
+    {
+        return mul * Cd;
+    }
+    else
+    {
+        return -1.0 * mul * Cd;
+    }
+    
+
+}
 
 
 

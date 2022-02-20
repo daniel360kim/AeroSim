@@ -25,6 +25,7 @@ public:
     double calculateCb();
 
     double calculateDragForce(double velocity);
+    double calcuateAxialDrag(double aoa);
 
     //Convert barometric and temp data from sensors into an altitude reading
     double altitude(double temperature, double pressure);

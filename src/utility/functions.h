@@ -9,8 +9,7 @@ class PolyInterpolator
 {
 
 public:
-	
-
+	std::vector<std::vector <double>> interpolationMatrix;
     PolyInterpolator(std::vector<std::vector<double>> points)
     {
 		int myCount = 0;
@@ -18,12 +17,15 @@ public:
 		{
 			myCount += points[i].size();
 		}
-		
+		if(myCount == 0)
+		{
+			std::cout << "ERROR myCount = 0" << std::endl;
+		}
 		this->count = myCount;
 
 		std::vector <int> mul(myCount, 1); //making a vector with the number of constraints all filled with 1
 
-		std::vector<std::vector<double>> matrix(myCount, std::vector(myCount, 0.0));
+		std::vector<std::vector<double>> matrix(myCount, std::vector<double> (myCount, 0));
 		unsigned int row = 0;
 		for(int j = 0; j < points.size(); j++)
 		{
@@ -55,7 +57,7 @@ public:
 	{
 		if(values.size() != count)
 		{
-			//error here
+			std::cout << "ERROR! values don't match count" << std::endl;
 		}
 
 		std::vector<double> ret(count, 0.0);
@@ -70,7 +72,7 @@ public:
 		return ret;
 	}
 
-	double eval(double x, std::vector<double> coefficients)
+	static double eval(double x, std::vector<double> coefficients)
 	{
 		double v = 1.0;
 		double result = 0;
@@ -84,7 +86,7 @@ public:
 
 	double interpolate(double x, std::vector<double> values)
 	{
-		return(eval(x, interpolator(values)));
+		return eval(x, interpolator(values));
 	}
 
 
@@ -93,12 +95,12 @@ public:
 private:
 
     unsigned int numberPoints;
-	std::vector<std::vector <double>> interpolationMatrix;
+	
 	int count;
 
-	void gaussian(std::vector<std::vector<double>> a, std::vector<int> index)
+	static void gaussian(std::vector<std::vector<double>> a, std::vector<int> &index)
 	{
-		unsigned int n = index.size();
+		int n = index.size();
 		std::vector<double> c(n, 0.0);
 		//Init the index
 		for(int i = 0; i < n; i++) 
@@ -123,7 +125,7 @@ private:
 
 		//Searching for the pivoting element from each column
 		int k = 0;
-		for (int j = 0; j < n - 1; j++)
+		for(int j = 0; j < n - 1; j++)
 		{
 			double pi1 = 0.0;
 			for(int i = j; i < n; i++)
@@ -159,12 +161,12 @@ private:
 		
 	}
 
-	std::vector<std::vector<double>> inverse(std::vector<std::vector <double>> matrix)
+	static std::vector<std::vector<double>> inverse(std::vector<std::vector <double>> matrix)
 	{
-		unsigned int n = matrix.size();
+		int n = matrix.size();
 
-		std::vector<std::vector<double>> x(n, std::vector(n, 0.0));
-		std::vector<std::vector<double>> b(n, std::vector(n, 0.0));
+		std::vector<std::vector<double>> x(n, std::vector<double> (n, 0));
+		std::vector<std::vector<double>> b(n, std::vector<double> (n, 0));
 
 		std::vector<int> index(n, 0);
 		for (int i = 0; i < n; i++)
