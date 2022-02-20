@@ -1,3 +1,19 @@
+/*
+Author: Daniel Kim - NM Rocketry
+
+All the functions to calculate aerodynamic properties of the model rocket.
+These equations include both Barrowman's derivations along with solutions from the OpenRocket software
+
+Certain aspects (such as motor mount diameter) do not serve much of a purpose, but will be integrated later
+
+Coefficient of axial drag and pressure drag depend on the Polynomial Interpolation class, which needs refining, so the values can be ~+/- 0.003 off... Will fix it!
+
+
+*/
+
+
+
+
 #include "Aero.h"
 #include "../Properties/Rocket.h"
 #include "../utility/functions.h"

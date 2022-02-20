@@ -1,3 +1,25 @@
+/*
+Polynomial Interpolator: Will be used for axial drag calculations and for pressure drag coefficient
+Uses lots of vectors, and will be updated to be able to be compatible with the Arduino framework
+
+Almost a direct copy of the OpenRocket PolyInterpolator as this is a rewrite of the OpenRocket software in C++ in order to be used on a model rocket flight computer.
+
+	//Description of this class from OpenRocket:
+ * A class for polynomial interpolation.  The interpolation constraints can be specified
+ * either as function values or values of the n'th derivative of the function.
+ * Using an interpolation consists of three steps:
+ * 1. constructing a PolyInterpolator using the interpolation x coordinates 
+ * 2. generating the interpolation polynomial using the function and derivative values 
+ * 3. evaluating the polynomial at the desired point
+ * The constructor takes an array of double arrays.  The first array defines x coordinate
+ * values for the function values, the second array x coordinate values for the function's
+ * derivatives, the third array for second derivatives and so on.  
+ * Generating the interpolation polynomial is performed by the method 
+ * Finally, evaluating the polynomial at different positions takes O(n) time.
+ 
+*/
+
+
 #ifndef function_h
 #define function_h
 
